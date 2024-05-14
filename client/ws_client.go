@@ -4,9 +4,9 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"ssh-tui/config"
-	"ssh-tui/entity"
 
+	"github.com/KKogaa/shh-tui/config"
+	"github.com/KKogaa/shh-tui/entity"
 	"github.com/gorilla/websocket"
 )
 

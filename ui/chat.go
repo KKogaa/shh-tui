@@ -2,11 +2,11 @@ package ui
 
 import (
 	"fmt"
-	"ssh-tui/client"
-	"ssh-tui/config"
-	"ssh-tui/entity"
 	"strings"
 
+	"github.com/KKogaa/shh-tui/client"
+	"github.com/KKogaa/shh-tui/config"
+	"github.com/KKogaa/shh-tui/entity"
 	"github.com/charmbracelet/bubbles/textarea"
 	"github.com/charmbracelet/bubbles/viewport"
 	tea "github.com/charmbracelet/bubbletea"

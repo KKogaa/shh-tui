@@ -2,10 +2,13 @@ package main
 
 import (
 	"log"
-	"ssh-tui/client"
-	"ssh-tui/config"
-	"ssh-tui/ui"
+	// "ssh-tui/client"
+	// "ssh-tui/config"
+	// "ssh-tui/ui"
 
+	"github.com/KKogaa/shh-tui/client"
+	"github.com/KKogaa/shh-tui/config"
+	"github.com/KKogaa/shh-tui/ui"
 	tea "github.com/charmbracelet/bubbletea"
 )
 
