@@ -18,7 +18,6 @@ type WSClient struct {
 func NewWsClient(config *config.Config) (WSClient, error) {
 
 	conn, _, err := websocket.DefaultDialer.Dial(config.Server.URL, nil)
-	// conn, _, err := websocket.DefaultDialer.Dial("ws://ec2-3-84-186-150.compute-1.amazonaws.com:8080/ws", nil)
 	if err != nil {
 		log.Fatal("error connecting to WebSocket server:", err)
 	}
@@ -32,8 +31,9 @@ func NewWsClient(config *config.Config) (WSClient, error) {
 func (w WSClient) SendMessage(message string) error {
 
 	msg := entity.Message{
-		User: w.config.Client.Username,
-		Msg:  message,
+		User:     w.config.Client.Username,
+		Msg:      message,
+		Chatroom: "test",
 	}
 	jsonMsg, err := json.Marshal(msg)
 	err = w.websocketConn.WriteMessage(websocket.TextMessage, []byte(jsonMsg))

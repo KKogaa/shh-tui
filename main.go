@@ -25,6 +25,7 @@ func main() {
 		log.Fatal(err)
 	}
 
+	//TODO: add read message history from rest api, load latest messages
 	p := tea.NewProgram(ui.InitialModel(wsClient, config))
 
 	//TODO: run goroutine somewhere else
