@@ -22,6 +22,7 @@ type Config struct {
 			Height int `mapstructure:"height"`
 		} `mapstructure:"chatbox"`
 		Username string `mapstructure:"username"`
+		Chatroom string `mapstructure:"chatroom"`
 	} `mapstructure:"client"`
 }
 
@@ -39,6 +40,7 @@ func LoadConfig() (*Config, error) {
 	viper.AutomaticEnv()
 	viper.SetDefault("server.url", "ws://localhost:8080/ws")
 	viper.SetDefault("client.username", "noname")
+	viper.SetDefault("client.chatroom", "default")
 	viper.SetDefault("client.chat.width", 200)
 	viper.SetDefault("client.chat.height", 5)
 	viper.SetDefault("client.chatbox.height", 200)

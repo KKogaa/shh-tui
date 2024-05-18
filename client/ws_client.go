@@ -33,12 +33,17 @@ func (w WSClient) SendMessage(message string) error {
 	msg := entity.Message{
 		User:     w.config.Client.Username,
 		Msg:      message,
-		Chatroom: "test",
+		Chatroom: w.config.Client.Chatroom,
 	}
+
 	jsonMsg, err := json.Marshal(msg)
+	if err != nil {
+		return fmt.Errorf("erro marshalling request: %s", err)
+	}
+
 	err = w.websocketConn.WriteMessage(websocket.TextMessage, []byte(jsonMsg))
 	if err != nil {
-		return fmt.Errorf("Error sending message to WebSocket server: %s", err)
+		return fmt.Errorf("error sending message to WebSocket server: %s", err)
 	}
 
 	return nil

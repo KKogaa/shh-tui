@@ -22,6 +22,7 @@ func main() {
 
 	//TODO: add multiple chatrooms to connect
 	//TODO: add authentication to the ws client
+	restClient := client.NewRestClient(config)
 
 	wsClient, err := client.NewWsClient(config)
 	if err != nil {
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	//TODO: add read message history from rest api, load latest messages
-	p := tea.NewProgram(ui.InitialModel(wsClient, config))
+	p := tea.NewProgram(ui.InitialModel(restClient, wsClient, config))
 
 	//TODO: run goroutine somewhere else
 	go func() {

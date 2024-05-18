@@ -2,6 +2,7 @@ package ui
 
 import (
 	"fmt"
+	"log"
 	"strings"
 
 	"github.com/KKogaa/shh-tui/client"
@@ -20,15 +21,17 @@ type model struct {
 	senderStyle lipgloss.Style
 	err         error
 	wsClient    client.WSClient
+	restClient  client.RestClient
 	config      *config.Config
 }
 
-func InitialModel(wsClient client.WSClient, config *config.Config) model {
+func InitialModel(restClient client.RestClient, wsClient client.WSClient, config *config.Config) model {
 
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
 	ta.Prompt = "| "
+	//TODO: change char limit
 	ta.CharLimit = 280
 
 	//TODO: resize this model depending on the terminal window
@@ -43,13 +46,29 @@ func InitialModel(wsClient client.WSClient, config *config.Config) model {
 	// vp.KeyMap.PageUp.SetEnabled(false)
 	// vp.SetContent("")
 
+	//TODO: clean this section to only return messages
+	respMsgs, err := restClient.GetMessagesByChatroomName(config.Client.Chatroom)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	messages := []string{}
+	for _, msg := range respMsgs {
+		displayMsg := fmt.Sprintf("%s: %s", msg.User, msg.Msg)
+		messages = append(messages, lipgloss.NewStyle().Foreground(lipgloss.Color("5")).Render(displayMsg))
+		vp.SetContent(strings.Join(messages, "\n"))
+	}
+
+	vp.GotoBottom()
+
 	return model{
 		textarea:    ta,
-		messages:    []string{},
+		messages:    messages,
 		viewport:    vp,
 		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("5")),
 		err:         nil,
 		wsClient:    wsClient,
+		restClient:  restClient,
 		config:      config,
 	}
 
@@ -72,7 +91,6 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 	case tea.KeyMsg:
 		switch msg.Type {
 		case tea.KeyCtrlC, tea.KeyEsc:
-			fmt.Println(m.textarea.Value())
 			return m, tea.Quit
 		case tea.KeyEnter:
 			m.wsClient.SendMessage(m.textarea.Value())
@@ -89,7 +107,11 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 		displayMsg := fmt.Sprintf("%s: %s", msg.User, msg.Msg)
 		m.messages = append(m.messages, m.senderStyle.Render(displayMsg))
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
-		m.textarea.Reset()
+
+		if msg.User == m.config.Client.Username {
+			m.textarea.Reset()
+		}
+
 		m.viewport.GotoBottom()
 		return m, nil
 	}
