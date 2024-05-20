@@ -2,9 +2,6 @@ package main
 
 import (
 	"log"
-	// "ssh-tui/client"
-	// "ssh-tui/config"
-	// "ssh-tui/ui"
 
 	"github.com/KKogaa/shh-tui/client"
 	"github.com/KKogaa/shh-tui/config"

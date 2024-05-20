@@ -20,8 +20,7 @@ func NewRestClient(config *config.Config) RestClient {
 }
 
 func (r RestClient) GetMessagesByChatroomName(chatroomName string) ([]entity.Message, error) {
-	//TODO: get this from config and modify config to only use the server ip
-	apiUrl := fmt.Sprintf("http://localhost:8080/messages/chatrooms/%s", chatroomName)
+	apiUrl := fmt.Sprintf("http://%s/messages/chatrooms/%s", r.config.Server.URL, chatroomName)
 	client := &http.Client{}
 	req, err := http.NewRequest(http.MethodGet, apiUrl, nil)
 	if err != nil {

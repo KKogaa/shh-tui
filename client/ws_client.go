@@ -17,7 +17,8 @@ type WSClient struct {
 
 func NewWsClient(config *config.Config) (WSClient, error) {
 
-	conn, _, err := websocket.DefaultDialer.Dial(config.Server.URL, nil)
+	url := fmt.Sprintf("ws://%s/ws", config.Server.URL)
+	conn, _, err := websocket.DefaultDialer.Dial(url, nil)
 	if err != nil {
 		log.Fatal("error connecting to WebSocket server:", err)
 	}
