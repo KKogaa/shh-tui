@@ -25,14 +25,21 @@ type model struct {
 	config      *config.Config
 }
 
+func CreateMsg(username string, msg string) string {
+	//if the message is bigger than the config width go
+	// displayMsg := fmt.Sprintf("%s: %s", username, msg)
+	//TODO: extract message here
+
+	return ""
+}
+
 func InitialModel(restClient client.RestClient, wsClient client.WSClient, config *config.Config) model {
 
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
 	ta.Prompt = "| "
-	//TODO: change char limit
-	ta.CharLimit = 280
+	ta.CharLimit = config.Client.Chatbox.Width
 
 	//TODO: resize this model depending on the terminal window
 	ta.SetWidth(config.Client.Chatbox.Width)

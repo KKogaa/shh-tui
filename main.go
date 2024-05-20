@@ -17,7 +17,6 @@ func main() {
 		log.Fatal(err)
 	}
 
-	//TODO: add multiple chatrooms to connect
 	//TODO: add authentication to the ws client
 	restClient := client.NewRestClient(config)
 

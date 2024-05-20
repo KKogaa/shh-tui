@@ -1,11 +1,13 @@
 package config
 
 import (
+	"errors"
 	"fmt"
 	"os/user"
 	"path/filepath"
 
 	"github.com/spf13/viper"
+	"golang.org/x/term"
 )
 
 type Config struct {
@@ -26,6 +28,19 @@ type Config struct {
 	} `mapstructure:"client"`
 }
 
+func GetTerminalWidth() (int, error) {
+	if !term.IsTerminal(0) {
+		return 0, errors.New("error not executing on a terminal")
+	}
+
+	width, _, err := term.GetSize(0)
+	if err != nil {
+		return 0, errors.New("error obtaining width of terminal")
+	}
+
+	return width, nil
+}
+
 func LoadConfig() (*Config, error) {
 	homeDir, err := user.Current()
 	if err != nil {
@@ -41,9 +56,15 @@ func LoadConfig() (*Config, error) {
 	viper.SetDefault("server.url", "ws://localhost:8080/ws")
 	viper.SetDefault("client.username", "noname")
 	viper.SetDefault("client.chatroom", "default")
-	viper.SetDefault("client.chat.width", 200)
+
+	defaultWidth, err := GetTerminalWidth()
+	if err != nil {
+		return nil, err
+	}
+
+	viper.SetDefault("client.chat.width", defaultWidth)
 	viper.SetDefault("client.chat.height", 5)
-	viper.SetDefault("client.chatbox.height", 200)
+	viper.SetDefault("client.chatbox.width", defaultWidth)
 	viper.SetDefault("client.chatbox.height", 3)
 
 	if err := viper.ReadInConfig(); err != nil {

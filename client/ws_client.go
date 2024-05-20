@@ -31,6 +31,10 @@ func NewWsClient(config *config.Config) (WSClient, error) {
 
 func (w WSClient) SendMessage(message string) error {
 
+	if len(message) == 0 {
+		return nil
+	}
+
 	msg := entity.Message{
 		User:     w.config.Client.Username,
 		Msg:      message,
