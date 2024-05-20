@@ -16,14 +16,13 @@ import (
 )
 
 type model struct {
-	viewport    viewport.Model
-	messages    []string
-	textarea    textarea.Model
-	senderStyle lipgloss.Style
-	err         error
-	wsClient    client.WSClient
-	restClient  client.RestClient
-	config      *config.Config
+	viewport   viewport.Model
+	messages   []string
+	textarea   textarea.Model
+	err        error
+	wsClient   client.WSClient
+	restClient client.RestClient
+	config     *config.Config
 }
 
 func splitEveryNChars(str string, n int) ([]string, error) {
@@ -67,7 +66,6 @@ func InitialModel(restClient client.RestClient, wsClient client.WSClient,
 	vp.KeyMap.Up.SetKeys("up")
 	vp.KeyMap.Down.SetKeys("down")
 
-	//TODO: clean this section to only return messages
 	respMsgs, err := restClient.GetMessagesByChatroomName(config.Client.Chatroom)
 	if err != nil {
 		log.Fatal(err)
@@ -83,14 +81,13 @@ func InitialModel(restClient client.RestClient, wsClient client.WSClient,
 	vp.GotoBottom()
 
 	return model{
-		textarea:    ta,
-		messages:    messages,
-		viewport:    vp,
-		senderStyle: lipgloss.NewStyle().Foreground(lipgloss.Color("5")),
-		err:         nil,
-		wsClient:    wsClient,
-		restClient:  restClient,
-		config:      config,
+		textarea:   ta,
+		messages:   messages,
+		viewport:   vp,
+		err:        nil,
+		wsClient:   wsClient,
+		restClient: restClient,
+		config:     config,
 	}
 
 }
@@ -122,7 +119,7 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 
 	case entity.Message:
 		displayMsg := CreateDisplayMsg(msg.User, msg.Msg, m.config.Client.Chat.Width)
-		m.messages = append(m.messages, m.senderStyle.Render(displayMsg))
+		m.messages = append(m.messages, displayMsg)
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 
 		if msg.User == m.config.Client.Username {
