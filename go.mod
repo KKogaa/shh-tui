@@ -1,6 +1,6 @@
 module github.com/KKogaa/shh-tui
 
-go 1.20
+go 1.22.3
 
 require (
 	github.com/charmbracelet/bubbles v0.18.0
@@ -8,6 +8,7 @@ require (
 	github.com/charmbracelet/lipgloss v0.10.0
 	github.com/gorilla/websocket v1.5.1
 	github.com/spf13/viper v1.18.2
+	golang.org/x/term v0.20.0
 )
 
 require (
@@ -41,7 +42,6 @@ require (
 	golang.org/x/net v0.19.0 // indirect
 	golang.org/x/sync v0.7.0 // indirect
 	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/term v0.20.0 // indirect
 	golang.org/x/text v0.14.0 // indirect
 	gopkg.in/ini.v1 v1.67.0 // indirect
 	gopkg.in/yaml.v3 v3.0.1 // indirect

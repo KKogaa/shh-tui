@@ -1,6 +1,7 @@
 package ui
 
 import (
+	"errors"
 	"fmt"
 	"log"
 	"strings"
@@ -25,23 +26,38 @@ type model struct {
 	config      *config.Config
 }
 
-func CreateMsg(username string, msg string) string {
-	//if the message is bigger than the config width go
-	// displayMsg := fmt.Sprintf("%s: %s", username, msg)
-	//TODO: extract message here
-
-	return ""
+func splitEveryNChars(str string, n int) ([]string, error) {
+	if n <= 0 {
+		return nil, errors.New("error wrong split for n must not be zero")
+	}
+	substrings := make([]string, 0, (len(str)+n-1)/n)
+	for i := 0; i < len(str); i += n {
+		end := min(i+n, len(str))
+		substrings = append(substrings, str[i:end])
+	}
+	return substrings, nil
 }
 
-func InitialModel(restClient client.RestClient, wsClient client.WSClient, config *config.Config) model {
+func CreateDisplayMsg(username string, msg string, width int) string {
+	entireMsg := fmt.Sprintf("%s: %s", username, msg)
+	splitSentences, err := splitEveryNChars(entireMsg, width-10)
+	if err != nil {
+		return entireMsg
+	}
+	newMsg := strings.Join(splitSentences, "\n")
+	newMsg = lipgloss.NewStyle().Foreground(lipgloss.Color("5")).Render(newMsg)
+	return newMsg
+}
+
+func InitialModel(restClient client.RestClient, wsClient client.WSClient,
+	config *config.Config) model {
 
 	ta := textarea.New()
 	ta.Placeholder = "Send a message..."
 	ta.Focus()
 	ta.Prompt = "| "
-	ta.CharLimit = config.Client.Chatbox.Width
+	ta.CharLimit = config.Client.Chatbox.Width * config.Client.Chatbox.Height
 
-	//TODO: resize this model depending on the terminal window
 	ta.SetWidth(config.Client.Chatbox.Width)
 	ta.SetHeight(config.Client.Chatbox.Height)
 	ta.ShowLineNumbers = false
@@ -50,8 +66,6 @@ func InitialModel(restClient client.RestClient, wsClient client.WSClient, config
 	vp := viewport.New(config.Client.Chat.Width, config.Client.Chat.Height)
 	vp.KeyMap.Up.SetKeys("up")
 	vp.KeyMap.Down.SetKeys("down")
-	// vp.KeyMap.PageUp.SetEnabled(false)
-	// vp.SetContent("")
 
 	//TODO: clean this section to only return messages
 	respMsgs, err := restClient.GetMessagesByChatroomName(config.Client.Chatroom)
@@ -61,8 +75,8 @@ func InitialModel(restClient client.RestClient, wsClient client.WSClient, config
 
 	messages := []string{}
 	for _, msg := range respMsgs {
-		displayMsg := fmt.Sprintf("%s: %s", msg.User, msg.Msg)
-		messages = append(messages, lipgloss.NewStyle().Foreground(lipgloss.Color("5")).Render(displayMsg))
+		displayMsg := CreateDisplayMsg(msg.User, msg.Msg, config.Client.Chat.Width)
+		messages = append(messages, displayMsg)
 		vp.SetContent(strings.Join(messages, "\n"))
 	}
 
@@ -101,17 +115,13 @@ func (m model) Update(msg tea.Msg) (tea.Model, tea.Cmd) {
 			return m, tea.Quit
 		case tea.KeyEnter:
 			m.wsClient.SendMessage(m.textarea.Value())
-			// m.messages = append(m.messages, m.senderStyle.Render("You: ")+m.textarea.Value())
-			// m.viewport.SetContent(strings.Join(m.messages, "\n"))
-			// m.textarea.Reset()
-			// m.viewport.GotoBottom()
 			return m, nil
 		default:
 			return m, nil
 		}
 
 	case entity.Message:
-		displayMsg := fmt.Sprintf("%s: %s", msg.User, msg.Msg)
+		displayMsg := CreateDisplayMsg(msg.User, msg.Msg, m.config.Client.Chat.Width)
 		m.messages = append(m.messages, m.senderStyle.Render(displayMsg))
 		m.viewport.SetContent(strings.Join(m.messages, "\n"))
 
